@@ -27,11 +27,8 @@
           </div>
 
           <div id="contoh" class="device-stage" aria-label="Preview toko Cekel Store">
-            <div class="laptop-device">
-              <div class="laptop-screen">
-                <StorePreview compact="desktop" />
-              </div>
-              <div class="laptop-base"></div>
+            <div class="screen-device">
+              <StorePreview compact="desktop" />
             </div>
 
             <div class="phone-device">

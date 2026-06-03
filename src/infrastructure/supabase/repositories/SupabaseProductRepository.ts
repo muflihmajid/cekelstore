@@ -9,7 +9,7 @@ export class SupabaseProductRepository implements ProductRepository {
     const { data, error } = await supabase
       .from('products')
       .select('*')
-      .eq('shop_id', shopId)
+      .eq('store_id', shopId)
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: false });
 
@@ -23,7 +23,7 @@ export class SupabaseProductRepository implements ProductRepository {
 
     const { data, error } = await supabase
       .from('products')
-      .insert({ shop_id: shopId, ...cleanRow })
+      .insert({ store_id: shopId, ...cleanRow })
       .select('*')
       .single();
 

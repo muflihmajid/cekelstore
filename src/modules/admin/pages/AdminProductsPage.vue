@@ -20,8 +20,9 @@
             </select>
             <select v-model="filterStatus" class="input">
               <option value="all">Semua Status</option>
-              <option value="available">Tersedia</option>
-              <option value="empty">Habis</option>
+              <option value="tersedia">Tersedia</option>
+              <option value="habis">Habis</option>
+              <option value="pre-order">Pre-order</option>
             </select>
           </div>
         </div>
@@ -34,7 +35,7 @@
               <td><div style="display:flex; align-items:center; gap:12px"><img :src="product.imageUrl || '/assets/cekel-store-icon.svg'" :alt="product.name" class="product-thumb" /><strong>{{ product.name }}</strong></div></td>
               <td>{{ categoryName(product.categoryId) }}</td>
               <td>{{ formatCurrency(product.price) }}</td>
-              <td><span class="badge" :class="product.isAvailable ? 'badge--success' : 'badge--muted'">{{ product.isAvailable ? 'Tersedia' : 'Habis' }}</span></td>
+              <td><span class="badge" :class="statusBadgeClass(product.status)">{{ statusLabel(product.status) }}</span></td>
               <td><div class="actions"><AppButton variant="secondary" @click="edit(product)">Edit</AppButton><AppButton variant="danger" @click="remove(product.id)">Hapus</AppButton></div></td>
             </tr>
           </tbody>
@@ -70,11 +71,13 @@
           <AppInput v-model="form.description" label="Deskripsi singkat" textarea />
           <label class="field">
             <span class="field__label">Status</span>
-            <select v-model="form.isAvailable" class="input">
-              <option :value="true">Tersedia</option>
-              <option :value="false">Habis</option>
+            <select v-model="form.status" class="input">
+              <option value="tersedia">Tersedia</option>
+              <option value="habis">Habis</option>
+              <option value="pre-order">Pre-order</option>
             </select>
           </label>
+          <AppInput v-model="form.stock" label="Stok opsional" type="number" />
           <AppButton :loading="loading">Simpan Produk</AppButton>
         </form>
       </div>
@@ -84,7 +87,7 @@
 
 <script setup lang="ts">
 import { computed, inject, reactive, ref, watch } from 'vue';
-import type { Category, Product } from '@/core/domain/entities';
+import type { Category, Product, ProductStatus } from '@/core/domain/entities';
 import { saveProduct } from '@/application/usecases/product/SaveProduct';
 import { repositories } from '@/infrastructure/supabase/repositories';
 import { formatCurrency } from '@/core/utils/formatters';
@@ -108,14 +111,14 @@ const search = ref('');
 const filterCategory = ref('all');
 const filterStatus = ref('all');
 
-const form = reactive({ id: undefined as string | undefined, name: '', description: '', price: 0, categoryId: null as string | null, imageUrl: '', isAvailable: true });
+const form = reactive({ id: undefined as string | undefined, name: '', description: '', price: 0, categoryId: null as string | null, imageUrl: '', status: 'tersedia' as ProductStatus, stock: null as number | null });
 
 const filteredProducts = computed(() => {
   const keyword = search.value.trim().toLowerCase();
   return products.value.filter((product) => {
     const matchSearch = !keyword || product.name.toLowerCase().includes(keyword);
     const matchCategory = filterCategory.value === 'all' || product.categoryId === filterCategory.value;
-    const matchStatus = filterStatus.value === 'all' || (filterStatus.value === 'available' ? product.isAvailable : !product.isAvailable);
+    const matchStatus = filterStatus.value === 'all' || product.status === filterStatus.value;
     return matchSearch && matchCategory && matchStatus;
   });
 });
@@ -127,18 +130,20 @@ async function load() {
   ]);
 }
 
-function resetForm() { form.id = undefined; form.name = ''; form.description = ''; form.price = 0; form.categoryId = null; form.imageUrl = ''; form.isAvailable = true; imageFile.value = null; }
+function resetForm() { form.id = undefined; form.name = ''; form.description = ''; form.price = 0; form.categoryId = null; form.imageUrl = ''; form.status = 'tersedia'; form.stock = null; imageFile.value = null; }
 function openCreate() { resetForm(); showForm.value = true; }
 function closeForm() { showForm.value = false; resetForm(); }
-function edit(product: Product) { form.id = product.id; form.name = product.name; form.description = product.description || ''; form.price = product.price; form.categoryId = product.categoryId; form.imageUrl = product.imageUrl || ''; form.isAvailable = product.isAvailable; imageFile.value = null; showForm.value = true; }
+function edit(product: Product) { form.id = product.id; form.name = product.name; form.description = product.description || ''; form.price = product.price; form.categoryId = product.categoryId; form.imageUrl = product.imageUrl || ''; form.status = product.status; form.stock = product.stock; imageFile.value = null; showForm.value = true; }
 function onImageChange(event: Event) { const target = event.target as HTMLInputElement; imageFile.value = target.files?.[0] || null; if (imageFile.value) form.imageUrl = URL.createObjectURL(imageFile.value); }
 function categoryName(id: string | null) { return categories.value.find((category) => category.id === id)?.name || '-'; }
+function statusLabel(status: ProductStatus) { return status === 'pre-order' ? 'Pre-order' : status === 'habis' ? 'Habis' : 'Tersedia'; }
+function statusBadgeClass(status: ProductStatus) { return status === 'pre-order' ? 'badge--warning' : status === 'habis' ? 'badge--muted' : 'badge--success'; }
 
 async function submit() {
   if (!shop.value) return;
   loading.value = true; error.value = null;
   try {
-    await saveProduct({ id: form.id, shopId: shop.value.id, name: form.name, description: form.description || null, price: Number(form.price), categoryId: form.categoryId, imageUrl: form.imageUrl || null, isAvailable: form.isAvailable, imageFile: imageFile.value });
+    await saveProduct({ id: form.id, shopId: shop.value.id, name: form.name, description: form.description || null, price: Number(form.price), categoryId: form.categoryId, imageUrl: form.imageUrl || null, status: form.status, stock: form.stock ? Number(form.stock) : null, imageFile: imageFile.value });
     await load(); closeForm();
   } catch (err) { error.value = getErrorMessage(err); }
   finally { loading.value = false; }

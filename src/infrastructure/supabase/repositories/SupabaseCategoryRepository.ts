@@ -9,7 +9,7 @@ export class SupabaseCategoryRepository implements CategoryRepository {
     const { data, error } = await supabase
       .from('categories')
       .select('*')
-      .eq('shop_id', shopId)
+      .eq('store_id', shopId)
       .order('sort_order', { ascending: true })
       .order('name', { ascending: true });
 
@@ -20,7 +20,7 @@ export class SupabaseCategoryRepository implements CategoryRepository {
   async create(shopId: string, name: string): Promise<Category> {
     const { data, error } = await supabase
       .from('categories')
-      .insert({ shop_id: shopId, name, sort_order: 0 })
+      .insert({ store_id: shopId, name, sort_order: 0 })
       .select('*')
       .single();
 

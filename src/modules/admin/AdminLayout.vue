@@ -1,7 +1,7 @@
 <template>
   <div class="admin-shell">
     <aside class="sidebar">
-      <RouterLink to="/" class="brand-row">
+      <RouterLink to="/admin" class="brand-row">
         <img src="/assets/cekel-store-icon.svg" alt="Cekel Store" class="brand-logo" />
         <div>
           <strong>Cekel Store</strong><br />
@@ -9,14 +9,16 @@
         </div>
       </RouterLink>
       <nav class="sidebar-nav">
-        <RouterLink to="/admin"><span class="sidebar-icon">D</span>Dashboard</RouterLink>
-        <RouterLink to="/admin/profil"><span class="sidebar-icon">P</span>Profil Toko</RouterLink>
-        <RouterLink to="/admin/produk"><span class="sidebar-icon">B</span>Produk</RouterLink>
-        <RouterLink to="/admin/kategori"><span class="sidebar-icon">K</span>Kategori</RouterLink>
-        <RouterLink to="/admin/statistik"><span class="sidebar-icon">S</span>Statistik</RouterLink>
+        <RouterLink to="/admin"><span class="sidebar-icon"><LayoutDashboard :size="17" /></span>Dashboard</RouterLink>
+        <RouterLink to="/admin/profil"><span class="sidebar-icon"><Store :size="17" /></span>Profil Toko</RouterLink>
+        <RouterLink to="/admin/produk"><span class="sidebar-icon"><Package :size="17" /></span>Produk</RouterLink>
+        <RouterLink to="/admin/kategori"><span class="sidebar-icon"><Tags :size="17" /></span>Kategori</RouterLink>
+        <RouterLink to="/admin/statistik"><span class="sidebar-icon"><ChartNoAxesColumnIncreasing :size="17" /></span>Statistik</RouterLink>
+        <RouterLink to="/admin/tema"><span class="sidebar-icon"><Palette :size="17" /></span>Tema Toko</RouterLink>
+        <RouterLink to="/admin/qr"><span class="sidebar-icon"><QrCode :size="17" /></span>QR Toko</RouterLink>
       </nav>
-      <div style="margin-top:auto" class="grid">
-        <div v-if="shop" style="display:flex; align-items:center; gap:10px; color:rgba(255,255,255,.84)">
+      <div class="sidebar-store-card">
+        <div v-if="shop" class="sidebar-store-profile">
           <img :src="shop.logoUrl || '/assets/cekel-store-icon.svg'" alt="Logo toko" class="brand-logo" />
           <div>
             <strong>{{ shop.name }}</strong><br />
@@ -39,6 +41,7 @@
 <script setup lang="ts">
 import { provide, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { ChartNoAxesColumnIncreasing, LayoutDashboard, Package, Palette, QrCode, Store, Tags } from '@lucide/vue';
 import type { Shop } from '@/core/domain/entities';
 import { getOrCreateMyShop } from '@/application/usecases/shop/GetOrCreateMyShop';
 import { supabase } from '@/infrastructure/supabase/client';

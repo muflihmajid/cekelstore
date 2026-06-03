@@ -60,7 +60,7 @@
                 </div>
                 <div style="display:flex; justify-content:space-between; align-items:center; gap:10px">
                   <div class="price">{{ formatCurrency(product.price) }}</div>
-                  <span class="badge" :class="product.isAvailable ? 'badge--success' : 'badge--muted'">{{ product.isAvailable ? 'Tersedia' : 'Habis' }}</span>
+                  <span class="badge" :class="statusBadgeClass(product.status)">{{ statusLabel(product.status) }}</span>
                 </div>
                 <AppButton v-if="product.isAvailable" block @click="addToCart(product)">Tambah ke Keranjang</AppButton>
                 <AppButton v-else block disabled variant="ghost">Stok Habis</AppButton>
@@ -111,7 +111,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import type { Product } from '@/core/domain/entities';
+import type { Product, ProductStatus } from '@/core/domain/entities';
 import { getPublicStore, type PublicStoreData } from '@/application/usecases/shop/GetPublicStore';
 import { repositories } from '@/infrastructure/supabase/repositories';
 import { applyThemeVars } from '@/core/utils/themes';
@@ -141,7 +141,10 @@ const filteredProducts = computed(() => {
 async function loadStore() {
   loading.value = true;
   store.value = await getPublicStore(slug.value);
-  if (store.value) applyThemeVars(store.value.shop.themeKey);
+  if (store.value) {
+    applyThemeVars(store.value.shop.themeKey);
+    await repositories.analytics.track(store.value.shop.id, 'visit');
+  }
   loading.value = false;
 }
 
@@ -159,6 +162,8 @@ async function checkout() {
 }
 
 function scrollToCart() { cartRef.value?.scrollIntoView({ behavior: 'smooth' }); }
+function statusLabel(status: ProductStatus) { return status === 'pre-order' ? 'Pre-order' : status === 'habis' ? 'Habis' : 'Tersedia'; }
+function statusBadgeClass(status: ProductStatus) { return status === 'pre-order' ? 'badge--warning' : status === 'habis' ? 'badge--muted' : 'badge--success'; }
 async function shareStore() {
   const url = window.location.href;
   if (navigator.share && store.value) await navigator.share({ title: store.value.shop.name, url });

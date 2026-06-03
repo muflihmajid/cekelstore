@@ -1,13 +1,40 @@
 <template>
-  <div class="store-preview" :class="`store-preview--${compact}`">
+  <div v-if="compact === 'mobile'" class="mobile-store-preview">
+    <div class="mobile-status">9:41</div>
+    <section class="mobile-store-hero">
+      <div class="mobile-logo">Dapur<br />Nona</div>
+      <div class="mobile-hero-art">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div class="mobile-hero-copy">
+        <h2>Dapur Nona</h2>
+        <p>Aneka kue dan camilan rumahan khas dengan bahan pilihan dan cita rasa istimewa.</p>
+      </div>
+    </section>
+
+    <div class="mobile-search">Cari produk...</div>
+
+    <div class="mobile-categories">
+      <div v-for="category in mobileCategories" :key="category.label">
+        <span>{{ category.icon }}</span>
+        <strong>{{ category.label }}</strong>
+      </div>
+    </div>
+
+    <div class="mobile-product-list">
+      <article v-for="(product, index) in mobileProducts" :key="product.name">
+        <div class="mobile-product-thumb" :class="`mobile-product-thumb--${index + 1}`"></div>
+        <strong>{{ product.name }}</strong>
+        <span>{{ product.price }}</span>
+      </article>
+    </div>
+  </div>
+
+  <div v-else class="store-preview store-preview--desktop">
     <header class="store-preview__top">
       <strong>Cekel Store</strong>
-      <nav>
-        <span>Fitur</span>
-        <span>Harga</span>
-        <span>Contoh Toko</span>
-        <span>Panduan</span>
-      </nav>
       <button>Pesan Sekarang</button>
     </header>
 
@@ -53,5 +80,19 @@ const products = [
   { name: 'Brownies', price: 'Rp 45.000' },
   { name: 'Kastengel', price: 'Rp 55.000' },
   { name: 'Keripik Pisang', price: 'Rp 28.000' },
+];
+
+const mobileCategories = [
+  { label: 'Semua', icon: '\u2318' },
+  { label: 'Kue Kering', icon: '\u{1F36A}' },
+  { label: 'Camilan', icon: '\u{1F968}' },
+  { label: 'Minuman', icon: '\u{1F964}' },
+  { label: 'Hampers', icon: '\u{1F381}' },
+];
+
+const mobileProducts = [
+  { name: 'Nastar', price: 'Rp 60.000' },
+  { name: 'Brownies', price: 'Rp 45.000' },
+  { name: 'Kastengel', price: 'Rp 55.000' },
 ];
 </script>

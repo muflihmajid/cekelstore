@@ -1,4 +1,4 @@
-import type { Product } from '@/core/domain/entities';
+import type { Product, ProductStatus } from '@/core/domain/entities';
 import { repositories } from '@/infrastructure/supabase/repositories';
 
 export interface ProductFormInput {
@@ -9,7 +9,9 @@ export interface ProductFormInput {
   description: string | null;
   price: number;
   imageUrl: string | null;
-  isAvailable: boolean;
+  status: ProductStatus;
+  stock?: number | null;
+  isAvailable?: boolean;
   imageFile?: File | null;
 }
 
@@ -25,7 +27,9 @@ export async function saveProduct(input: ProductFormInput): Promise<Product> {
     description: input.description,
     price: input.price,
     imageUrl,
-    isAvailable: input.isAvailable,
+    status: input.status,
+    stock: input.stock ?? null,
+    isAvailable: input.status !== 'habis',
   };
 
   if (input.id) return repositories.products.update(input.id, payload);

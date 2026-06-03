@@ -1,7 +1,8 @@
-# Cekel Store v1.0 — Vue TypeScript + Supabase
+# Cekel Store
 
-Cekel Store adalah toko online ringan untuk UMKM yang langsung checkout ke WhatsApp.
-Project ini dibuat sebagai **v1.0 Gratis Beta / MVP** dengan arsitektur yang lebih rapi agar mudah dikembangkan ke v1.1, v1.2, dan integrasi Kasir Ringan.
+Cekel Store adalah aplikasi toko online ringan untuk UMKM Indonesia. User bisa daftar, membuat toko, mengelola produk, membagikan link/QR toko, lalu pelanggan checkout langsung ke WhatsApp.
+
+Project ini fokus pada aplikasi utama, bukan landing page marketing.
 
 ## Stack
 
@@ -15,41 +16,7 @@ Project ini dibuat sebagai **v1.0 Gratis Beta / MVP** dengan arsitektur yang leb
 - Supabase RLS
 - QR Code generator
 
-## Fitur v1.0
-
-- Halaman toko publik `/toko/:slug`
-- Profil toko: nama, logo, deskripsi, WhatsApp, jam buka, alamat, link sosial opsional
-- Katalog produk
-- Kategori produk
-- Search produk
-- Keranjang belanja
-- Checkout WhatsApp otomatis
-- Admin produk: tambah, edit, hapus, upload foto, harga, kategori, status tersedia/habis
-- Admin kategori
-- Tema warna toko: Blue Teal, Aqua Soft, Ocean Blue, Warm Clay, Slate Premium
-- QR Code toko
-- Statistik dasar: kunjungan, klik WhatsApp, produk paling sering diklik
-- Branding gratis: “Dibuat dengan Cekel Works”
-- Halaman spesifikasi `/spesifikasi-v1`
-
-## Struktur Clean Architecture Ringan
-
-```txt
-src/
-  app/                         # App root dan router
-  core/                        # Domain entity, repository contract, config, utils, errors
-  application/usecases/         # Use case bisnis
-  infrastructure/supabase/      # Implementasi Supabase repository + storage
-  modules/                      # Feature modules: landing, auth, admin, storefront, specification
-  shared/                       # Shared components dan composables
-  styles/                       # Global CSS
-supabase/migrations/            # SQL schema, RLS, bucket, seed demo
-public/assets/                  # Logo dan asset publik
-```
-
-Prinsipnya: UI tidak langsung penuh dengan query Supabase. Query Supabase berada di `infrastructure`, lalu dipanggil lewat use case di `application`.
-
-## Cara Menjalankan Lokal
+## Cara Install
 
 ```bash
 npm install
@@ -57,80 +24,100 @@ cp .env.example .env
 npm run dev
 ```
 
-Isi `.env`:
+Isi `.env` dengan kredensial Supabase:
 
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
-VITE_PUBLIC_SITE_URL=http://localhost:5173
 ```
 
 ## Setup Supabase
 
-1. Buat project Supabase.
-2. Buka SQL Editor.
-3. Jalankan file:
+1. Buat project di Supabase.
+2. Aktifkan Auth Email/Password.
+3. Buka SQL Editor.
+4. Jalankan migration:
 
 ```txt
-supabase/migrations/001_initial_schema.sql
+supabase/migrations/202606030001_app_schema_rls.sql
 ```
 
-4. Pastikan Auth Email/Password aktif.
-5. Jalankan app lokal.
-6. Buka `/admin`, daftar akun, lalu login.
-
-## Route Penting
-
-- `/` — landing page
-- `/login` — login/register admin
-- `/admin` — dashboard admin
-- `/admin/profil` — edit profil toko
-- `/admin/produk` — kelola produk
-- `/admin/kategori` — kelola kategori
-- `/admin/statistik` — statistik dasar
-- `/admin/checklist-v1` — checklist fitur MVP
-- `/spesifikasi-v1` — dokumen fitur v1.0
-- `/toko/:slug` — halaman toko publik
-
-## Demo Seed
-
-Migration membuat toko demo:
+5. Pastikan bucket Storage berikut ada dan public:
 
 ```txt
-/toko/demo-dapur-nona
+store-assets
+product-images
 ```
 
-Jika memakai Supabase baru dan SQL berhasil dijalankan, route demo tersebut langsung bisa dibuka.
+Migration sudah mencoba membuat bucket dan policy otomatis. Jika environment Supabase membatasi perubahan storage lewat SQL, buat bucket manual dari dashboard Supabase lalu jalankan ulang policy yang diperlukan.
 
-## Deployment ke Vercel
+## Environment Variables
 
-1. Push ke GitHub.
-2. Import project ke Vercel.
-3. Tambahkan environment variables:
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY`
-   - `VITE_PUBLIC_SITE_URL`
-4. Deploy.
+```txt
+VITE_SUPABASE_URL
+VITE_SUPABASE_ANON_KEY
+```
 
-`vercel.json` sudah disiapkan untuk SPA rewrite.
+## Route Tersedia
 
-## Catatan Pengembangan Berikutnya
+- `/login` - login admin toko
+- `/register` - daftar akun dan toko
+- `/onboarding` - setup toko awal
+- `/admin` - dashboard admin
+- `/admin/profil` - profil toko
+- `/admin/produk` - kelola produk
+- `/admin/kategori` - kelola kategori
+- `/admin/statistik` - statistik dasar
+- `/admin/qr` - QR dan share link toko
+- `/admin/tema` - tema tampilan toko
+- `/toko/:slug` - toko publik
 
-v1.1 yang disarankan:
+Route `/` diarahkan ke `/login` karena landing page marketing tidak menjadi fokus app ini.
 
-- Form data pelanggan sebelum checkout
-- Draft order tersimpan
-- Status order sederhana
-- Payment manual: transfer bank, QRIS toko, COD
-- Tombol kirim bukti bayar ke WhatsApp
-- Customer list sederhana
+## Fitur
 
-v1.2:
+- Register/login dengan Supabase Auth
+- Onboarding toko
+- Dashboard admin dengan statistik dasar
+- CRUD profil toko, kategori, dan produk
+- Upload logo toko dan gambar produk ke Supabase Storage
+- Tema toko
+- QR toko, copy link, download QR, share WhatsApp
+- Public storefront berdasarkan slug
+- Keranjang client-side
+- Checkout WhatsApp dengan pesan otomatis
+- Analytics dasar: kunjungan toko, klik produk, klik WhatsApp
+- RLS policy untuk melindungi data tiap owner
 
-- Banner promo
-- Produk unggulan
-- Harga coret
-- Voucher sederhana
-- Link promo
-- Export order
-- Stok opsional
+## Struktur Project
+
+```txt
+src/
+  app/
+    router/
+  core/
+    domain/
+    errors/
+    utils/
+  application/
+    usecases/
+  infrastructure/
+    supabase/
+      repositories/
+      storage/
+  modules/
+    auth/
+    onboarding/
+    admin/
+    storefront/
+  shared/
+    components/
+    composables/
+  styles/
+supabase/
+  migrations/
+```
+
+## Catatan
+
+Cart boleh disimpan di client karena cart bukan backend utama. Data toko, produk, kategori, auth, storage, dan analytics tetap menggunakan Supabase.

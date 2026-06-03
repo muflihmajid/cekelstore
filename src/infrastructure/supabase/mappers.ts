@@ -7,21 +7,25 @@ export type ShopRow = {
   name: string;
   description: string | null;
   whatsapp_number: string;
+  business_category?: string | null;
   logo_url: string | null;
+  banner_url?: string | null;
   address: string | null;
   opening_hours: string | null;
   instagram_url: string | null;
-  website_url: string | null;
+  tiktok_url?: string | null;
   marketplace_url: string | null;
-  theme_key: ThemeKey;
-  status: 'draft' | 'active' | 'disabled';
+  theme_color?: string | null;
+  theme_key?: ThemeKey | null;
+  is_active?: boolean | null;
+  status?: 'draft' | 'active' | 'disabled' | null;
   created_at: string;
   updated_at: string;
 };
 
 export type CategoryRow = {
   id: string;
-  shop_id: string;
+  store_id: string;
   name: string;
   sort_order: number;
   created_at: string;
@@ -29,13 +33,14 @@ export type CategoryRow = {
 
 export type ProductRow = {
   id: string;
-  shop_id: string;
+  store_id: string;
   category_id: string | null;
   name: string;
   description: string | null;
   price: number;
   image_url: string | null;
-  is_available: boolean;
+  status: 'tersedia' | 'habis' | 'pre-order';
+  stock: number | null;
   sort_order: number;
   created_at: string;
   updated_at: string;
@@ -53,10 +58,10 @@ export function mapShop(row: ShopRow): Shop {
     address: row.address,
     openingHours: row.opening_hours,
     instagramUrl: row.instagram_url,
-    websiteUrl: row.website_url,
+    websiteUrl: row.tiktok_url || null,
     marketplaceUrl: row.marketplace_url,
-    themeKey: row.theme_key,
-    status: row.status,
+    themeKey: (row.theme_key || row.theme_color || 'blue-teal') as ThemeKey,
+    status: row.status || (row.is_active === false ? 'disabled' : 'active'),
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -72,17 +77,17 @@ export function shopToRow(payload: Partial<Shop>) {
     address: payload.address,
     opening_hours: payload.openingHours,
     instagram_url: payload.instagramUrl,
-    website_url: payload.websiteUrl,
+    tiktok_url: payload.websiteUrl,
     marketplace_url: payload.marketplaceUrl,
-    theme_key: payload.themeKey,
-    status: payload.status,
+    theme_color: payload.themeKey,
+    is_active: payload.status ? payload.status === 'active' : undefined,
   };
 }
 
 export function mapCategory(row: CategoryRow): Category {
   return {
     id: row.id,
-    shopId: row.shop_id,
+    shopId: row.store_id,
     name: row.name,
     sortOrder: row.sort_order,
     createdAt: row.created_at,
@@ -99,13 +104,15 @@ export function categoryToRow(payload: Partial<Category>) {
 export function mapProduct(row: ProductRow): Product {
   return {
     id: row.id,
-    shopId: row.shop_id,
+    shopId: row.store_id,
     categoryId: row.category_id,
     name: row.name,
     description: row.description,
     price: Number(row.price),
     imageUrl: row.image_url,
-    isAvailable: row.is_available,
+    status: row.status,
+    stock: row.stock,
+    isAvailable: row.status !== 'habis',
     sortOrder: row.sort_order,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -119,7 +126,8 @@ export function productToRow(payload: Partial<Product>) {
     description: payload.description,
     price: payload.price,
     image_url: payload.imageUrl,
-    is_available: payload.isAvailable,
+    status: payload.status || (payload.isAvailable === undefined ? undefined : (payload.isAvailable ? 'tersedia' : 'habis')),
+    stock: payload.stock,
     sort_order: payload.sortOrder,
   };
 }

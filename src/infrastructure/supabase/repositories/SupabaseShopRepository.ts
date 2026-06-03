@@ -18,7 +18,7 @@ export class SupabaseShopRepository implements ShopRepository {
 
     const fallbackSlug = `toko-${ownerId.slice(0, 8)}`;
     const { data, error } = await supabase
-      .from('shops')
+      .from('stores')
       .insert({
         owner_id: ownerId,
         slug: fallbackSlug,
@@ -26,8 +26,8 @@ export class SupabaseShopRepository implements ShopRepository {
         description: 'Toko online ringan yang langsung terhubung ke WhatsApp.',
         whatsapp_number: '6281234567890',
         opening_hours: 'Buka setiap hari 08.00 - 20.00',
-        theme_key: 'blue-teal',
-        status: 'active',
+        theme_color: 'blue-teal',
+        is_active: true,
       })
       .select('*')
       .single();
@@ -38,7 +38,7 @@ export class SupabaseShopRepository implements ShopRepository {
 
   async getMyShop(ownerId: string): Promise<Shop | null> {
     const { data, error } = await supabase
-      .from('shops')
+      .from('stores')
       .select('*')
       .eq('owner_id', ownerId)
       .order('created_at', { ascending: true })
@@ -51,10 +51,10 @@ export class SupabaseShopRepository implements ShopRepository {
 
   async getShopBySlug(slug: string): Promise<Shop | null> {
     const { data, error } = await supabase
-      .from('shops')
+      .from('stores')
       .select('*')
       .eq('slug', makeSlug(slug))
-      .eq('status', 'active')
+      .eq('is_active', true)
       .maybeSingle();
 
     if (error) throw new AppError('Gagal mengambil halaman toko.', error);
@@ -66,7 +66,7 @@ export class SupabaseShopRepository implements ShopRepository {
     const cleanRow = Object.fromEntries(Object.entries(row).filter(([, value]) => value !== undefined));
 
     const { data, error } = await supabase
-      .from('shops')
+      .from('stores')
       .update(cleanRow)
       .eq('id', shopId)
       .select('*')

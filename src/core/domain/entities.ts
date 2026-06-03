@@ -1,6 +1,7 @@
 export type ThemeKey = 'blue-teal' | 'aqua-soft' | 'ocean-blue' | 'warm-clay' | 'slate-premium';
 
 export type StoreStatus = 'draft' | 'active' | 'disabled';
+export type ProductStatus = 'tersedia' | 'habis' | 'pre-order';
 
 export interface Shop {
   id: string;
@@ -37,6 +38,8 @@ export interface Product {
   description: string | null;
   price: number;
   imageUrl: string | null;
+  status: ProductStatus;
+  stock: number | null;
   isAvailable: boolean;
   sortOrder: number;
   createdAt: string;

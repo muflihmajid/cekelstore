@@ -1,119 +1,170 @@
 <template>
-  <section v-if="shop">
-    <div class="admin-header">
-      <div class="admin-title">
-        <h1>Selamat pagi, {{ shop.name }}</h1>
-        <p>Kelola toko Anda dengan mudah hari ini.</p>
+  <section v-if="shop" class="dashboard-page">
+    <div class="dashboard-hero">
+      <div class="dashboard-greeting">
+        <span class="dashboard-sun" aria-hidden="true"></span>
+        <div>
+          <h1>Selamat pagi, {{ shop.name }}</h1>
+          <p>Kelola toko Anda dengan mudah hari ini.</p>
+        </div>
       </div>
-      <div class="actions">
-        <span class="badge badge--muted">7 hari terakhir</span>
+      <div class="dashboard-actions">
+        <span class="dashboard-filter"><CalendarDays :size="18" /> 7 hari terakhir <ChevronDown :size="16" /></span>
         <RouterLink :to="`/toko/${shop.slug}`" target="_blank"><AppButton>Lihat Toko</AppButton></RouterLink>
       </div>
     </div>
 
-    <div class="grid grid-4">
-      <div v-for="metric in metrics" :key="metric.label" class="card card-pad stat-card">
-        <span class="badge">{{ metric.label }}</span>
-        <h2>{{ metric.value }}</h2>
-        <p>{{ metric.helper }}</p>
-      </div>
+    <div class="dashboard-stats">
+      <article v-for="metric in metrics" :key="metric.label" class="dashboard-stat-card" :class="`dashboard-stat-card--${metric.tone}`">
+        <span class="dashboard-stat-icon"><component :is="metric.icon" :size="28" stroke-width="2.1" /></span>
+        <div>
+          <strong>{{ metric.label }}</strong>
+          <h2>{{ metric.value }}</h2>
+          <p>{{ metric.helper }}</p>
+        </div>
+        <svg class="dashboard-spark" aria-hidden="true" viewBox="0 0 120 48" fill="none">
+          <path class="dashboard-spark-fill" d="M4 38 C18 35 22 24 36 27 C48 30 53 39 66 33 C78 27 79 15 92 13 C104 11 108 24 116 18 L116 48 L4 48 Z" />
+          <path class="dashboard-spark-line" d="M4 38 C18 35 22 24 36 27 C48 30 53 39 66 33 C78 27 79 15 92 13 C104 11 108 24 116 18" />
+          <circle class="dashboard-spark-dot" cx="92" cy="13" r="3.2" />
+          <circle class="dashboard-spark-dot" cx="116" cy="18" r="3.2" />
+        </svg>
+      </article>
     </div>
 
-    <div class="grid grid-2" style="margin-top:18px">
-      <div class="card card-pad chart-card">
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px">
-          <h3 style="margin:0">Kesiapan Toko</h3>
-          <span class="badge badge--muted">{{ readinessScore }}%</span>
+    <div class="dashboard-main-grid">
+      <article class="dashboard-card dashboard-readiness-card">
+        <div class="dashboard-card-head">
+          <div>
+            <h2>Kesiapan Toko</h2>
+            <p>Pastikan toko siap menerima pesanan dari WhatsApp.</p>
+          </div>
+          <span class="dashboard-score">{{ readinessScore }}%</span>
         </div>
-        <div style="margin-top:18px">
-          <div class="progress-row">
+        <div class="dashboard-progress">
+          <div>
             <strong>Skor kesiapan</strong>
             <span>{{ readinessScore }}%</span>
-            <div class="progress-bar"><span :style="{ width: `${readinessScore}%` }"></span></div>
           </div>
-          <div v-for="item in readinessItems" :key="item.label" class="activity-item" style="grid-template-columns:34px 1fr auto; margin-top:10px">
-            <span class="activity-dot">{{ item.done ? '✓' : '!' }}</span>
+          <div class="progress-bar"><span :style="{ width: `${readinessScore}%` }"></span></div>
+        </div>
+        <div class="dashboard-checklist">
+          <div v-for="item in readinessItems" :key="item.label" class="dashboard-check-item" :class="{ 'is-ready': item.done }">
+            <span class="dashboard-check-icon"><component :is="item.done ? Check : AlertCircle" :size="20" stroke-width="2.4" /></span>
             <div>
               <strong>{{ item.label }}</strong>
-              <div style="color:var(--color-muted); font-size:13px">{{ item.helper }}</div>
+              <p>{{ item.helper }}</p>
             </div>
-            <span class="badge" :class="item.done ? 'badge--success' : 'badge--muted'">{{ item.done ? 'Siap' : 'Perlu' }}</span>
+            <span class="dashboard-status" :class="item.done ? 'is-ready' : 'is-needed'">{{ item.done ? 'Siap' : 'Perlu' }}</span>
           </div>
         </div>
-      </div>
+      </article>
 
-      <div class="card card-pad">
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:14px">
-          <h3 style="margin:0">Aktivitas Terbaru</h3>
-          <span class="badge badge--muted">Live</span>
+      <article class="dashboard-card dashboard-activity-card">
+        <div class="dashboard-card-head">
+          <div>
+            <h2>Aktivitas Terbaru</h2>
+            <p>Langkah berikutnya agar toko makin siap jualan.</p>
+          </div>
+          <span class="dashboard-live"><span></span>Live</span>
         </div>
-        <div class="activity-list">
-          <div v-for="activity in activities" :key="activity.title" class="activity-item">
-            <span class="activity-dot">{{ activity.icon }}</span>
+        <div class="dashboard-timeline">
+          <div v-for="activity in activities" :key="activity.title" class="dashboard-timeline-item">
+            <span class="dashboard-timeline-dot">{{ activity.icon }}</span>
             <div>
               <strong>{{ activity.title }}</strong>
-              <div style="color:var(--color-muted); font-size:13px">{{ activity.text }}</div>
+              <p>{{ activity.text }}</p>
             </div>
             <small>{{ activity.time }}</small>
           </div>
         </div>
-      </div>
+      </article>
     </div>
 
-    <div class="grid grid-3" style="margin-top:18px">
-      <div class="card card-pad">
-        <h3 style="margin-top:0">QR Toko & Link</h3>
-        <p style="color:var(--color-muted)">Tempel QR di kemasan, meja kasir, bio, atau story.</p>
-        <img v-if="qrDataUrl" :src="qrDataUrl" alt="QR Code toko" class="qr-box" />
-        <div class="field" style="margin-top:12px">
-          <span class="field__label">Link Toko</span>
-          <input class="input" :value="shopUrl" readonly />
-        </div>
-        <div class="actions" style="margin-top:12px">
-          <AppButton variant="secondary" @click="copyLink">Salin Link</AppButton>
-          <a v-if="qrDataUrl" :href="qrDataUrl" download="qr-code-toko.png"><AppButton variant="ghost">Unduh QR</AppButton></a>
-        </div>
-      </div>
-
-      <div class="card card-pad">
-        <h3 style="margin-top:0">Produk Aktif</h3>
-        <div v-for="product in products.slice(0, 5)" :key="product.id" class="activity-item" style="grid-template-columns:46px 1fr auto">
-          <img :src="product.imageUrl || '/assets/cekel-store-icon.svg'" :alt="product.name" class="product-thumb" />
+    <div class="dashboard-bottom-grid">
+      <article class="dashboard-card dashboard-qr-card">
+        <div class="dashboard-card-title">
+          <span><QrCode :size="22" /></span>
           <div>
-            <strong>{{ product.name }}</strong>
-            <div style="color:var(--color-muted); font-size:13px">{{ formatCurrency(product.price) }}</div>
+            <h2>QR Toko & Link</h2>
+            <p>Tempel QR di kemasan, meja kasir, bio, atau story.</p>
           </div>
-          <span class="badge" :class="product.isAvailable ? 'badge--success' : 'badge--muted'">{{ product.isAvailable ? 'Ada' : 'Habis' }}</span>
         </div>
-        <EmptyState v-if="products.length === 0" title="Belum ada produk" description="Tambahkan produk pertama." icon="0" />
-      </div>
-
-      <div class="card card-pad">
-        <h3 style="margin-top:0">Mobile Admin Quick View</h3>
-        <div class="mobile-preview">
-          <div class="mobile-preview__top">
-            <strong>Dashboard</strong>
-            <div style="font-size:26px; font-weight:950; margin-top:14px">{{ products.length }}</div>
-            <small>Produk aktif</small>
+        <div class="dashboard-qr-content">
+          <div class="dashboard-qr-stand">
+            <img v-if="qrDataUrl" :src="qrDataUrl" alt="QR Code toko" />
           </div>
-          <div class="mobile-preview__body">
-            <div v-for="product in products.slice(0, 3)" :key="product.id" style="display:flex; align-items:center; gap:10px">
-              <img :src="product.imageUrl || '/assets/cekel-store-icon.svg'" :alt="product.name" class="product-thumb" />
-              <div>
-                <strong style="font-size:13px">{{ product.name }}</strong>
-                <div style="color:var(--color-muted); font-size:12px">{{ formatCurrency(product.price) }}</div>
+          <div class="dashboard-share-panel">
+            <label>
+              <span>Link Toko</span>
+              <input :value="shopUrl" readonly />
+            </label>
+            <div class="actions">
+              <AppButton variant="secondary" @click="copyLink">Salin Link</AppButton>
+              <a v-if="qrDataUrl" :href="qrDataUrl" download="qr-code-toko.png"><AppButton variant="ghost">Unduh QR</AppButton></a>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="dashboard-card dashboard-products-card">
+        <div class="dashboard-card-title">
+          <span><ShoppingBag :size="22" /></span>
+          <div>
+            <h2>Produk Aktif</h2>
+            <p>Kelola dan pantau produk yang aktif di toko.</p>
+          </div>
+        </div>
+        <div class="dashboard-product-visual">
+          <div class="dashboard-box-visual" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+          <div>
+            <strong>{{ activeProducts }}</strong>
+            <p>Total produk aktif</p>
+          </div>
+        </div>
+        <RouterLink to="/admin/produk"><AppButton variant="secondary" block>Kelola Produk</AppButton></RouterLink>
+      </article>
+
+      <article class="dashboard-card dashboard-mobile-card">
+        <div class="dashboard-card-title">
+          <span><Smartphone :size="22" /></span>
+          <div>
+            <h2>Mobile Admin Quick View</h2>
+            <p>Ringkasan toko dalam genggaman.</p>
+          </div>
+        </div>
+        <div class="dashboard-mobile-scene">
+          <div class="mobile-preview dashboard-mobile-preview">
+            <div class="mobile-preview__top">
+              <strong>Dashboard</strong>
+              <div>{{ activeProducts }}</div>
+              <small>Produk aktif</small>
+            </div>
+            <div class="mobile-preview__body">
+              <div v-for="product in products.slice(0, 2)" :key="product.id" class="dashboard-mobile-product">
+                <img :src="product.imageUrl || '/assets/cekel-store-icon.svg'" :alt="product.name" class="product-thumb" />
+                <div>
+                  <strong>{{ product.name }}</strong>
+                  <span>{{ formatCurrency(product.price) }}</span>
+                </div>
               </div>
             </div>
-            <RouterLink to="/admin/produk"><AppButton block>Kelola Produk</AppButton></RouterLink>
           </div>
+          <div class="dashboard-parcel-visual" aria-hidden="true"></div>
         </div>
-      </div>
+      </article>
+    </div>
+
+    <div v-if="products.length === 0" class="dashboard-empty-wrap">
+      <EmptyState title="Belum ada produk" description="Tambahkan produk pertama agar toko siap menerima pesanan." icon="0" />
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, watch } from 'vue';
+import { AlertCircle, CalendarDays, Check, ChevronDown, MessageCircle, Package, QrCode, ShoppingBag, Smartphone, Store, Tags } from '@lucide/vue';
 import type { Category, Product, StoreStats } from '@/core/domain/entities';
 import { env } from '@/core/config/env';
 import { repositories } from '@/infrastructure/supabase/repositories';
@@ -135,10 +186,10 @@ const shopUrl = computed(() => shop.value ? `${env.publicSiteUrl}/toko/${shop.va
 
 const activeProducts = computed(() => products.value.filter((product) => product.isAvailable).length);
 const metrics = computed(() => [
-  { label: 'Kunjungan Toko', value: String(stats.value?.visits ?? 0), helper: '30 hari terakhir' },
-  { label: 'Klik WhatsApp', value: String(stats.value?.checkoutClicks ?? 0), helper: 'Checkout tercatat' },
-  { label: 'Produk Aktif', value: String(activeProducts.value), helper: `${products.value.length} total produk` },
-  { label: 'Kategori', value: String(categories.value.length), helper: 'Kategori katalog' },
+  { label: 'Kunjungan Toko', value: String(stats.value?.visits ?? 0), helper: '30 hari terakhir', icon: Store, tone: 'teal' },
+  { label: 'Klik WhatsApp', value: String(stats.value?.checkoutClicks ?? 0), helper: 'Checkout tercatat', icon: MessageCircle, tone: 'green' },
+  { label: 'Produk Aktif', value: String(activeProducts.value), helper: `${products.value.length} total produk`, icon: Package, tone: 'amber' },
+  { label: 'Kategori', value: String(categories.value.length), helper: 'Kategori katalog', icon: Tags, tone: 'purple' },
 ]);
 
 const readinessItems = computed(() => [

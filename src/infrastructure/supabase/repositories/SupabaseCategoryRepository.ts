@@ -4,6 +4,11 @@ import type { Category } from '@/core/domain/entities';
 import { supabase } from '../client';
 import { categoryToRow, mapCategory, type CategoryRow } from '../mappers';
 
+function isMissingLegacyShopIdColumn(error: unknown) {
+  const message = String((error as { message?: string })?.message || '');
+  return message.includes('shop_id') && (message.includes('column') || message.includes('schema cache'));
+}
+
 export class SupabaseCategoryRepository implements CategoryRepository {
   async listByShop(shopId: string): Promise<Category[]> {
     const { data, error } = await supabase
@@ -18,11 +23,19 @@ export class SupabaseCategoryRepository implements CategoryRepository {
   }
 
   async create(shopId: string, name: string): Promise<Category> {
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from('categories')
-      .insert({ store_id: shopId, name, sort_order: 0 })
+      .insert({ store_id: shopId, shop_id: shopId, name, sort_order: 0 })
       .select('*')
       .single();
+
+    if (error && isMissingLegacyShopIdColumn(error)) {
+      ({ data, error } = await supabase
+        .from('categories')
+        .insert({ store_id: shopId, name, sort_order: 0 })
+        .select('*')
+        .single());
+    }
 
     if (error || !data) throw new AppError('Gagal membuat kategori.', error);
     return mapCategory(data);

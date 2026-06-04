@@ -25,7 +25,8 @@ export type ShopRow = {
 
 export type CategoryRow = {
   id: string;
-  store_id: string;
+  store_id?: string | null;
+  shop_id?: string | null;
   name: string;
   sort_order: number;
   created_at: string;
@@ -33,7 +34,8 @@ export type CategoryRow = {
 
 export type ProductRow = {
   id: string;
-  store_id: string;
+  store_id?: string | null;
+  shop_id?: string | null;
   category_id: string | null;
   name: string;
   description: string | null;
@@ -87,7 +89,7 @@ export function shopToRow(payload: Partial<Shop>) {
 export function mapCategory(row: CategoryRow): Category {
   return {
     id: row.id,
-    shopId: row.store_id,
+    shopId: row.store_id || row.shop_id || '',
     name: row.name,
     sortOrder: row.sort_order,
     createdAt: row.created_at,
@@ -104,7 +106,7 @@ export function categoryToRow(payload: Partial<Category>) {
 export function mapProduct(row: ProductRow): Product {
   return {
     id: row.id,
-    shopId: row.store_id,
+    shopId: row.store_id || row.shop_id || '',
     categoryId: row.category_id,
     name: row.name,
     description: row.description,
@@ -132,6 +134,12 @@ export function productToRow(payload: Partial<Product>) {
   };
 }
 
-export function mapStats(visits: number, checkoutClicks: number, productClicks: number, popularProducts: StoreStats['popularProducts']): StoreStats {
-  return { visits, checkoutClicks, productClicks, popularProducts };
+export function mapStats(
+  visits: number,
+  checkoutClicks: number,
+  productClicks: number,
+  popularProducts: StoreStats['popularProducts'],
+  dailySeries: StoreStats['dailySeries'] = [],
+): StoreStats {
+  return { visits, checkoutClicks, productClicks, dailySeries, popularProducts };
 }

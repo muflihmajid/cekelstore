@@ -57,6 +57,13 @@ export interface StoreStats {
   visits: number;
   checkoutClicks: number;
   productClicks: number;
+  dailySeries: Array<{
+    date: string;
+    label: string;
+    visits: number;
+    checkoutClicks: number;
+    productClicks: number;
+  }>;
   popularProducts: Array<{
     productId: string;
     productName: string;

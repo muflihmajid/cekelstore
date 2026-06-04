@@ -141,6 +141,12 @@ begin
     update public.categories
     set store_id = shop_id
     where store_id is null;
+
+    update public.categories
+    set shop_id = store_id
+    where shop_id is null and store_id is not null;
+
+    alter table public.categories alter column shop_id drop not null;
   end if;
 
   alter table public.products add column if not exists store_id uuid;
@@ -154,6 +160,12 @@ begin
     update public.products
     set store_id = shop_id
     where store_id is null;
+
+    update public.products
+    set shop_id = store_id
+    where shop_id is null and store_id is not null;
+
+    alter table public.products alter column shop_id drop not null;
   end if;
 
   if exists (

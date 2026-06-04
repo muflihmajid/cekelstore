@@ -4,6 +4,11 @@ import type { Product } from '@/core/domain/entities';
 import { supabase } from '../client';
 import { mapProduct, productToRow, type ProductRow } from '../mappers';
 
+function isMissingLegacyShopIdColumn(error: unknown) {
+  const message = String((error as { message?: string })?.message || '');
+  return message.includes('shop_id') && (message.includes('column') || message.includes('schema cache'));
+}
+
 export class SupabaseProductRepository implements ProductRepository {
   async listByShop(shopId: string): Promise<Product[]> {
     const { data, error } = await supabase
@@ -21,11 +26,19 @@ export class SupabaseProductRepository implements ProductRepository {
     const row = productToRow(payload);
     const cleanRow = Object.fromEntries(Object.entries(row).filter(([, value]) => value !== undefined));
 
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from('products')
-      .insert({ store_id: shopId, ...cleanRow })
+      .insert({ store_id: shopId, shop_id: shopId, ...cleanRow })
       .select('*')
       .single();
+
+    if (error && isMissingLegacyShopIdColumn(error)) {
+      ({ data, error } = await supabase
+        .from('products')
+        .insert({ store_id: shopId, ...cleanRow })
+        .select('*')
+        .single());
+    }
 
     if (error || !data) throw new AppError('Gagal membuat produk.', error);
     return mapProduct(data);

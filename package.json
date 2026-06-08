@@ -1,26 +1,40 @@
 {
-  "name": "cekel-store-vue-supabase-v1",
-  "version": "1.0.0",
-  "private": true,
+  "name": "cekel-storefront",
+  "version": "0.1.0",
+  "description": "Open-source storefront toolkit for WhatsApp-based small businesses.",
   "type": "module",
+  "license": "MIT",
+  "author": "Cekel Store",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "main": "./dist/cekel-storefront.umd.cjs",
+  "module": "./dist/cekel-storefront.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/cekel-storefront.js",
+      "require": "./dist/cekel-storefront.umd.cjs"
+    },
+    "./style.css": "./dist/style.css"
+  },
   "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
+    "build": "vue-tsc --emitDeclarationOnly && vite build",
+    "dev": "vite --host 0.0.0.0",
     "preview": "vite preview",
     "typecheck": "vue-tsc --noEmit"
   },
-  "dependencies": {
-    "@lucide/vue": "^1.17.0",
-    "@supabase/supabase-js": "^2.45.4",
-    "@vitejs/plugin-vue": "^5.1.4",
-    "chart.js": "^4.5.1",
-    "qrcode": "^1.5.4",
-    "vue": "^3.5.12",
-    "vue-router": "^4.4.5"
+  "peerDependencies": {
+    "vue": "^3.5.0"
   },
   "devDependencies": {
+    "@vitejs/plugin-vue": "^5.1.4",
     "typescript": "^5.6.3",
     "vite": "^5.4.10",
+    "vue": "^3.5.12",
     "vue-tsc": "^2.1.10"
   }
 }

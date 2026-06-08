@@ -1,0 +1,223 @@
+.cekel-storefront {
+  background: var(--cekel-color-muted);
+  border: 1px solid var(--cekel-color-border);
+  border-radius: var(--cekel-radius);
+  min-height: 100%;
+  padding: 24px;
+}
+
+.cekel-storefront__header {
+  align-items: flex-start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.cekel-storefront__identity {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+}
+
+.cekel-storefront__logo {
+  border-radius: var(--cekel-radius);
+  height: 56px;
+  object-fit: cover;
+  width: 56px;
+}
+
+.cekel-storefront__title {
+  font-size: 28px;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.cekel-storefront__description,
+.cekel-storefront__meta,
+.cekel-product-card__description,
+.cekel-cart-summary__line {
+  color: var(--cekel-color-subtle);
+}
+
+.cekel-storefront__description,
+.cekel-storefront__meta {
+  margin: 4px 0 0;
+}
+
+.cekel-storefront__toolbar {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  margin-bottom: 20px;
+}
+
+.cekel-search {
+  background: var(--cekel-color-surface);
+  border: 1px solid var(--cekel-color-border);
+  border-radius: var(--cekel-radius);
+  color: var(--cekel-color-text);
+  font: inherit;
+  min-height: 42px;
+  padding: 0 12px;
+  width: 100%;
+}
+
+.cekel-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cekel-category {
+  background: var(--cekel-color-surface);
+  border: 1px solid var(--cekel-color-border);
+  border-radius: var(--cekel-radius);
+  color: var(--cekel-color-text);
+  cursor: pointer;
+  font: inherit;
+  min-height: 38px;
+  padding: 7px 12px;
+}
+
+.cekel-category[aria-pressed="true"] {
+  background: var(--cekel-color-primary);
+  border-color: var(--cekel-color-primary);
+  color: var(--cekel-color-primary-contrast);
+}
+
+.cekel-product-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+}
+
+.cekel-product-card {
+  background: var(--cekel-color-surface);
+  border: 1px solid var(--cekel-color-border);
+  border-radius: var(--cekel-radius);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.cekel-product-card__image {
+  aspect-ratio: 4 / 3;
+  background: var(--cekel-color-muted);
+  object-fit: cover;
+  width: 100%;
+}
+
+.cekel-product-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+}
+
+.cekel-product-card__name {
+  font-size: 16px;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.cekel-product-card__description {
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.cekel-product-card__footer {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.cekel-product-card__price,
+.cekel-cart-summary__total {
+  font-weight: 800;
+}
+
+.cekel-cart-drawer {
+  background: var(--cekel-color-surface);
+  border-left: 1px solid var(--cekel-color-border);
+  box-shadow: var(--cekel-shadow);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-width: 420px;
+  padding: 18px;
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: min(100%, 420px);
+  z-index: 40;
+}
+
+.cekel-cart-drawer__header,
+.cekel-cart-drawer__item,
+.cekel-cart-summary__row {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.cekel-cart-drawer__items {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0;
+  overflow: auto;
+}
+
+.cekel-cart-drawer__item {
+  border-bottom: 1px solid var(--cekel-color-border);
+  padding-bottom: 12px;
+}
+
+.cekel-cart-drawer__item-title {
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.cekel-cart-drawer__quantity {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.cekel-cart-drawer__quantity button,
+.cekel-cart-drawer__close {
+  background: var(--cekel-color-muted);
+  border: 1px solid var(--cekel-color-border);
+  border-radius: var(--cekel-radius);
+  color: var(--cekel-color-text);
+  cursor: pointer;
+  min-height: 32px;
+  min-width: 32px;
+}
+
+.cekel-cart-summary {
+  border-top: 1px solid var(--cekel-color-border);
+  display: grid;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+@media (max-width: 720px) {
+  .cekel-storefront {
+    padding: 16px;
+  }
+
+  .cekel-storefront__header {
+    display: grid;
+  }
+
+  .cekel-storefront__toolbar {
+    grid-template-columns: 1fr;
+  }
+}

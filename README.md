@@ -1,123 +1,97 @@
-# Cekel Store
+# Cekel Storefront
 
-Cekel Store adalah aplikasi toko online ringan untuk UMKM Indonesia. User bisa daftar, membuat toko, mengelola produk, membagikan link/QR toko, lalu pelanggan checkout langsung ke WhatsApp.
+Cekel Storefront is an open-source storefront toolkit for WhatsApp-based small businesses. It helps developers build a simple product catalog, cart, and WhatsApp checkout flow with Vue 3, TypeScript, and lightweight CSS variables.
 
-Project ini fokus pada aplikasi utama, bukan landing page marketing.
+This repository is not the full Cekel Store SaaS product. The managed dashboard, order management, invoice PDF, analytics, hosting, billing, authentication, and premium features belong to Cekel Store Cloud and are intentionally not included here.
 
-## Stack
+## Features
 
-- Vue 3
-- TypeScript
-- Vite
-- Vue Router
-- Supabase Auth
-- Supabase PostgreSQL
-- Supabase Storage
-- Supabase RLS
-- QR Code generator
+- Storefront UI components for Vue 3
+- Product cards, grids, search, and category filtering
+- Client-side cart components and helpers
+- WhatsApp checkout URL and message helpers
+- Indonesian phone number normalization
+- Rupiah currency formatter
+- CSS variable theme presets
+- Basic Vue example app
 
-## Cara Install
+## Install
+
+```bash
+npm install cekel-storefront
+```
+
+## Basic Usage
+
+```vue
+<script setup lang="ts">
+import { CekelStorefront, type Product, type StoreProfile } from 'cekel-storefront';
+import 'cekel-storefront/style.css';
+
+const store: StoreProfile = {
+  name: 'Warung Segar',
+  description: 'Minuman dan camilan siap pesan lewat WhatsApp.',
+  whatsappNumber: '081234567890',
+  themeId: 'fresh',
+};
+
+const products: Product[] = [
+  { id: 'esteh', name: 'Es Teh', price: 10000, category: 'Minuman', available: true },
+  { id: 'roti', name: 'Roti Bakar', price: 15000, category: 'Snack', available: true },
+];
+</script>
+
+<template>
+  <CekelStorefront :store="store" :products="products" />
+</template>
+```
+
+## Public Scope
+
+Included:
+
+- Reusable storefront components
+- Product catalog components
+- Cart utilities
+- WhatsApp checkout helpers
+- Theme presets and CSS variables
+- Documentation and examples
+
+Not included:
+
+- Admin dashboard
+- Order management
+- Customer database
+- Supabase config or migrations
+- Secrets or `.env` values
+- Invoice PDF generator
+- Analytics dashboard
+- Repeat customer logic
+- Billing or subscription logic
+- Authentication flow
+
+## Documentation
+
+- [Getting started](docs/getting-started.md)
+- [Theming](docs/theming.md)
+- [WhatsApp checkout](docs/whatsapp-checkout.md)
+- [API reference](docs/api-reference.md)
+
+## Development
 
 ```bash
 npm install
-cp .env.example .env
+npm run build
+```
+
+Run the example:
+
+```bash
+cd examples/vue-basic
+npm install
 npm run dev
 ```
 
-Isi `.env` dengan kredensial Supabase:
+## License
 
-```env
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
-```
-
-## Setup Supabase
-
-1. Buat project di Supabase.
-2. Aktifkan Auth Email/Password.
-3. Buka SQL Editor.
-4. Jalankan migration:
-
-```txt
-supabase/migrations/202606030001_app_schema_rls.sql
-```
-
-5. Pastikan bucket Storage berikut ada dan public:
-
-```txt
-store-assets
-product-images
-```
-
-Migration sudah mencoba membuat bucket dan policy otomatis. Jika environment Supabase membatasi perubahan storage lewat SQL, buat bucket manual dari dashboard Supabase lalu jalankan ulang policy yang diperlukan.
-
-## Environment Variables
-
-```txt
-VITE_SUPABASE_URL
-VITE_SUPABASE_ANON_KEY
-```
-
-## Route Tersedia
-
-- `/login` - login admin toko
-- `/register` - daftar akun dan toko
-- `/onboarding` - setup toko awal
-- `/admin` - dashboard admin
-- `/admin/profil` - profil toko
-- `/admin/produk` - kelola produk
-- `/admin/kategori` - kelola kategori
-- `/admin/statistik` - statistik dasar
-- `/admin/qr` - QR dan share link toko
-- `/admin/tema` - tema tampilan toko
-- `/toko/:slug` - toko publik
-
-Route `/` diarahkan ke `/login` karena landing page marketing tidak menjadi fokus app ini.
-
-## Fitur
-
-- Register/login dengan Supabase Auth
-- Onboarding toko
-- Dashboard admin dengan statistik dasar
-- CRUD profil toko, kategori, dan produk
-- Upload logo toko dan gambar produk ke Supabase Storage
-- Tema toko
-- QR toko, copy link, download QR, share WhatsApp
-- Public storefront berdasarkan slug
-- Keranjang client-side
-- Checkout WhatsApp dengan pesan otomatis
-- Analytics dasar: kunjungan toko, klik produk, klik WhatsApp
-- RLS policy untuk melindungi data tiap owner
-
-## Struktur Project
-
-```txt
-src/
-  app/
-    router/
-  core/
-    domain/
-    errors/
-    utils/
-  application/
-    usecases/
-  infrastructure/
-    supabase/
-      repositories/
-      storage/
-  modules/
-    auth/
-    onboarding/
-    admin/
-    storefront/
-  shared/
-    components/
-    composables/
-  styles/
-supabase/
-  migrations/
-```
-
-## Catatan
-
-Cart boleh disimpan di client karena cart bukan backend utama. Data toko, produk, kategori, auth, storage, dan analytics tetap menggunakan Supabase.
+MIT
